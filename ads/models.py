@@ -1,7 +1,8 @@
 from django.db import models
-from companies.models import FieldOfActivity, Company, City, Province
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+from companies.models import FieldOfActivity, Company, City, Province
 
 
 class Skill(models.Model):
