@@ -4,7 +4,7 @@
 python pip install -r requirements.txt
 ```
 
-#### Configure the postgres database in the settings.py file and and run the following commands:
+#### Configure the postgres database in the settings.py file and run the following commands:
 ```python
 python manage.py makemigrations
 python manage.py migrate
