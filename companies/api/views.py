@@ -2,6 +2,7 @@ from rest_framework.generics import CreateAPIView, GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
 from companies.models import Company
 from .serializers import CompanySerializer, CreateCompanySerializer
@@ -15,6 +16,13 @@ class CreateCompanyAPIView(CreateAPIView):
     serializer_class = CreateCompanySerializer
     queryset = Company.objects.all()
     permission_classes = [IsAuthenticated, IsEmployer]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        employer = self.request.user
+        if queryset.filter(employer=employer).exists():
+            raise ValidationError("You already have a company.")
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(employer=self.request.user)
