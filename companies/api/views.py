@@ -23,7 +23,7 @@ class CreateCompanyAPIView(CreateAPIView):
 class ListCompaniesAPIView(ListAPIView):
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
-    pagination_class = [CustomPagination]
+    pagination_class = CustomPagination
 
 
 class RetrieveCompanyAPIView(GenericAPIView):
