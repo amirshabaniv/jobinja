@@ -13,6 +13,7 @@ from ads.api.serializers import AdForListSerializer
 
 class CreateCompanyAPIView(CreateAPIView):
     serializer_class = CreateCompanySerializer
+    queryset = Company.objects.all()
     permission_classes = [IsAuthenticated, IsEmployer]
 
     def perform_create(self, serializer):
@@ -27,6 +28,7 @@ class ListCompaniesAPIView(ListAPIView):
 
 class RetrieveCompanyAPIView(GenericAPIView):
     serializer_class = CompanySerializer
+    queryset = Company.objects.all()
 
     def get(self, request, name_en):
         try:
@@ -39,11 +41,16 @@ class RetrieveCompanyAPIView(GenericAPIView):
 
 class FieldOfActivityAPIView(GenericAPIView):
     serializer_class = CompanySerializer
-    pagination_class = [CustomPagination]
+    queryset = Company.objects.all()
+    pagination_class = CustomPagination
     
     def get(self, request, field_name):
         companies = Company.objects.filter(field_of_activity__name_en=field_name)
         if companies.exists():
+            page = self.paginate_queryset(companies)  
+            if page is not None:
+                srz = self.serializer_class(page, many=True)
+                return self.get_paginated_response(srz.data)  
             serializer = self.serializer_class(companies, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'error':'Companies not found'}, status=status.HTTP_400_BAD_REQUEST)
@@ -52,10 +59,15 @@ class FieldOfActivityAPIView(GenericAPIView):
 class CompanyAdsAPIView(GenericAPIView):
     serializer_class = AdForListSerializer
     queryset = Ad.objects.all()
+    pagination_class = CustomPagination
 
     def get(self, request, name_en):
         ads = Ad.objects.filter(company__name_en=name_en)
         if ads.exists():
+            page = self.paginate_queryset(ads)  
+            if page is not None:
+                srz = self.serializer_class(page, many=True)
+                return self.get_paginated_response(srz.data)  
             serializer = self.serializer_class(ads, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'error':'Ads not found'}, status=status.HTTP_400_BAD_REQUEST)
